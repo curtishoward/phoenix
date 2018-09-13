@@ -760,14 +760,14 @@ public class QueryDatabaseMetaDataIT extends ParallelStatsDisabledIT {
 
             TableDescriptor descriptor = admin.getDescriptor(TableName.valueOf(htableName));
             assertEquals(3, descriptor.getColumnFamilies().length);
-            ColumnFamilyDescriptor cdA = descriptor.getColumnFamily(cfA);
-            assertNotEquals(ColumnFamilyDescriptorBuilder.DEFAULT_KEEP_DELETED, cdA.getKeepDeletedCells());
+            HColumnDescriptor cdA = descriptor.getFamily(cfA);
+            assertNotEquals(HColumnDescriptor.DEFAULT_KEEP_DELETED, cdA.getKeepDeletedCellsAsEnum());
             assertEquals(DataBlockEncoding.NONE, cdA.getDataBlockEncoding()); // Overriden using
                                                                               // WITH
             assertEquals(1, cdA.getMaxVersions());// Overriden using WITH
             ColumnFamilyDescriptor cdB = descriptor.getColumnFamily(cfB);
             // Allow KEEP_DELETED_CELLS to be false for VIEW
-            assertEquals(ColumnFamilyDescriptorBuilder.DEFAULT_KEEP_DELETED, cdB.getKeepDeletedCells());
+            assertEquals(HColumnDescriptor.DEFAULT_KEEP_DELETED, cdB.getKeepDeletedCellsAsEnum());
             assertEquals(DataBlockEncoding.NONE, cdB.getDataBlockEncoding()); // Should keep the
                                                                               // original value.
             // CF c should stay the same since it's not a Phoenix cf.

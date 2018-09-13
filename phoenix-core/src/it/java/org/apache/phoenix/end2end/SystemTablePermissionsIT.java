@@ -23,6 +23,11 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.apache.hadoop.hbase.security.access.Permission.Action;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.phoenix.query.QueryServices;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -30,6 +35,7 @@ import org.junit.experimental.categories.Category;
  * Test that verifies a user can read Phoenix tables with a minimal set of permissions.
  * Uses HBase API directly to grant/revoke permissions
  */
+@Ignore("This test is flaky, disabled waiting for PHOENIX-4389")
 @Category(NeedsOwnMiniClusterTest.class)
 public class SystemTablePermissionsIT extends BasePermissionsIT {
 
