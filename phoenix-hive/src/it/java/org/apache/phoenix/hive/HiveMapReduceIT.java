@@ -24,11 +24,11 @@ import java.util.Map;
 
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.Ignore;
 
 @Category(NeedsOwnMiniClusterTest.class)
+@Ignore
 public class HiveMapReduceIT extends HivePhoenixStoreIT {
 
     @BeforeClass
@@ -38,25 +38,5 @@ public class HiveMapReduceIT extends HivePhoenixStoreIT {
             fail("HADOOP_CONF_DIR is non-empty in the current shell environment which will very likely cause this test to fail.");
         }
         setup(HiveTestUtil.MiniClusterType.mr);
-    }
-    
-    @Override
-    @Test
-    @Ignore 
-    /**
-     * Ignoring because precicate pushdown is skipped for MR (ref:HIVE-18873) when there are multiple aliases
-     */
-    public void testJoinNoColumnMaps() throws Exception {
-        
-    }
-    
-    @Override
-    @Test
-    @Ignore 
-    /**
-     * Ignoring because projection pushdown is incorrect for MR when there are multiple aliases (ref:HIVE-18872)
-     */
-    public void testJoinColumnMaps() throws Exception {
-        
     }
 }
