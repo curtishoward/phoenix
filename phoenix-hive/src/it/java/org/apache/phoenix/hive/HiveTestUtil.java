@@ -23,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -36,6 +37,7 @@ import org.apache.hadoop.hive.common.io.SortPrintStream;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.api.Index;
+import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.lockmgr.zookeeper.ZooKeeperHiveLockManager;
@@ -224,7 +226,7 @@ public class HiveTestUtil {
             // set fs.default.name to the uri of mini-dfs
             String dfsUriString = WindowsPathUtil.getHdfsUriString(dfs.getFileSystem().getUri()
                     .toString());
-            conf.setVar(HiveConf.ConfVars.HADOOPFS, dfsUriString);
+            conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, dfsUriString);
             // hive.metastore.warehouse.dir needs to be set relative to the mini-dfs
             conf.setVar(HiveConf.ConfVars.METASTOREWAREHOUSE,
                     (new Path(dfsUriString,
@@ -305,14 +307,8 @@ public class HiveTestUtil {
             dfs = shims.getMiniDfs(conf, numberOfDataNodes, true, null);
             FileSystem fs = dfs.getFileSystem();
             String uriString = WindowsPathUtil.getHdfsUriString(fs.getUri().toString());
-            if (clusterType == MiniClusterType.tez) {
-                conf.set("hive.execution.engine", "tez");
-                mr = shims.getMiniTezCluster(conf, 1, uriString, 1);
-            } else {
-                conf.set("hive.execution.engine", "mr");
-                mr = shims.getMiniMrCluster(conf, 1, uriString, 1);
-
-            }
+            conf.set("hive.execution.engine", "mr");
+            mr = shims.getMiniMrCluster(conf, 1, uriString, 1);
         }
 
         initConf();
@@ -577,7 +573,7 @@ public class HiveTestUtil {
         conf.set("hive.execution.engine", execEngine);
         db = Hive.get(conf);
         pd = new ParseDriver();
-        sem = new SemanticAnalyzer(conf);
+        sem = new SemanticAnalyzer(new QueryState(conf));
     }
 
     public void init(String tname) throws Exception {
@@ -598,7 +594,7 @@ public class HiveTestUtil {
 
         HiveConf.setVar(conf, HiveConf.ConfVars.HIVE_AUTHENTICATOR_MANAGER,
                 "org.apache.hadoop.hive.ql.security.HadoopDefaultAuthenticator");
-        Utilities.clearWorkMap();
+        Utilities.clearWorkMap(conf);
         CliSessionState ss = new CliSessionState(conf);
         assert ss != null;
         ss.in = System.in;
@@ -1019,7 +1015,7 @@ public class HiveTestUtil {
 
     public void resetParser() throws SemanticException {
         pd = new ParseDriver();
-        sem = new SemanticAnalyzer(conf);
+        sem = new SemanticAnalyzer(new QueryState(conf));
     }
 
     public TreeMap<String, String> getQMap() {
